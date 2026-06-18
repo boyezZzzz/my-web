@@ -125,21 +125,22 @@ const Jarak = {
 
     const base = `https://api.betabotz.eu.org/api/search/jarak?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&apikey=Boysz`;
     const proxies = [
-      base,
       `https://corsproxy.io/?url=${encodeURIComponent(base)}`,
       `https://api.allorigins.win/get?url=${encodeURIComponent(base)}`,
+      `https://thingproxy.freeboard.io/fetch/${base}`,
+      `https://proxy.cors.sh/${base}`,
     ];
 
     for (const url of proxies) {
       try {
-        let json = await this.tryFetch(url);
+        let json = await this.tryFetch(url, 20000);
         if (url.includes('allorigins') && json.contents) json = JSON.parse(json.contents);
-        if (json.message?.detail) {
+        if (json && json.message?.detail) {
           this.renderResult(json.message);
           this.setLoading(false);
           return;
         }
-      } catch(e) { console.warn('[Jarak]', e.message); }
+      } catch(e) { console.warn('[Jarak]', url.substring(0,40), e.message); }
     }
 
     this.showError('Gagal menghitung jarak. Periksa nama kota dan coba lagi.');
