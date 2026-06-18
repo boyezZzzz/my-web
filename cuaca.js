@@ -100,24 +100,25 @@ const Cuaca = {
 
     const base = `https://api.betabotz.eu.org/api/tools/cuaca?query=${encodeURIComponent(city)}&apikey=Boysz`;
     const proxies = [
-      base,
       `https://corsproxy.io/?url=${encodeURIComponent(base)}`,
       `https://api.allorigins.win/get?url=${encodeURIComponent(base)}`,
+      `https://thingproxy.freeboard.io/fetch/${base}`,
+      `https://proxy.cors.sh/${base}`,
     ];
 
     for (const url of proxies) {
       try {
-        let json = await this.tryFetch(url);
+        let json = await this.tryFetch(url, 18000);
         if (url.includes('allorigins') && json.contents) json = JSON.parse(json.contents);
-        if (json.status && json.result) {
+        if (json && json.status && json.result) {
           this.renderResult(json.result);
           this.setLoading(false);
           return;
         }
-      } catch(e) { console.warn('[Cuaca]', e.message); }
+      } catch(e) { console.warn('[Cuaca]', url.substring(0,40), e.message); }
     }
 
-    this.showError('Gagal memuat data cuaca. Coba kota lain atau coba lagi nanti.');
+    this.showError('Gagal memuat data cuaca. Coba lagi beberapa saat.');
     this.setLoading(false);
   },
 
